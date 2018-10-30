@@ -1,0 +1,5 @@
+[#ftl]
+[@b.navmenu]
+  [@ems.guard res="/feeDefault"][@b.navitem id="a" title="配置收费默认值" href="/feeDefault"/][/@]
+  [@ems.guard res="/creditFeeDefault"][@b.navitem title="学分收费标准" href="/creditFeeDefault"/][/@]
+[/@]

@@ -1,0 +1,16 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <mapping class="org.openurp.edu.base.code.model.FeeMode"/>
+    <mapping class="org.openurp.edu.base.code.model.FeeType"/>
+    <mapping class="org.openurp.edu.base.code.model.CurrencyCategory"/>
+
+    <mapping class="org.openurp.edu.fee.model.TuitionFee"/>
+    <mapping class="org.openurp.edu.fee.model.FeeDetail"/>
+    <mapping class="org.openurp.edu.fee.model.FeeDefault"/>
+    <mapping class="org.openurp.edu.fee.model.CreditFeeDefault"/>
+    <mapping class="org.openurp.edu.fee.model.stat.CreditFeeStat"/>
+  </session-factory>
+</hibernate-configuration>
