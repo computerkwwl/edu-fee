@@ -18,6 +18,7 @@
  */
 package org.openurp.edu.fee.web.action;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -25,115 +26,83 @@ import org.apache.commons.lang3.StringUtils;
 import org.beangle.commons.collection.CollectUtils;
 import org.beangle.commons.collection.Order;
 import org.beangle.commons.dao.query.builder.OqlBuilder;
-import org.beangle.commons.entity.Entity;
-import org.openurp.edu.base.code.model.FeeType;
-import org.openurp.edu.base.model.Student;
-import org.openurp.edu.fee.data.FeeTypeStat;
+import org.openurp.base.model.Department;
+import org.openurp.edu.base.code.model.EduSpan;
+import org.openurp.edu.base.model.Semester;
+import org.openurp.edu.fee.data.FeeStat1;
 import org.openurp.edu.fee.model.FeeDetail;
-import org.openurp.edu.fee.model.stat.CreditFeeStat;
-import org.openurp.edu.fee.utils.EntityUtils;
 import org.openurp.edu.web.action.SemesterSupportAction;
 
 /**
  * 收费统计
  *
  * @author chaostone
- *
  */
 public class FeeStatAction extends SemesterSupportAction {
 
-  /**
-   * @return
-   */
-  public String statFeeType() {
-    List<?> accounts = entityDao.search(buildQuery());
-    fillStudentAndFeeType((List<FeeTypeStat>) accounts);
-    put("accounts", accounts);
-    return forward();
+  protected void indexSetting() {
+    List<Semester> semesters = entityDao.get(Semester.class, "calendar", getProject().getCalendars());
+
+    Map<String, List<Semester>> semesterMap = CollectUtils.newHashMap();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+    for (Semester semester : semesters) {
+      String year = sdf.format(semester.getBeginOn());
+      if (!semesterMap.containsKey(year)) {
+        semesterMap.put(year, CollectUtils.newArrayList());
+      }
+      semesterMap.get(year).add(semester);
+    }
+    put("semesterMap", semesterMap);
   }
 
   /**
-   * 统计学费与学分不符的记录
+   * “学费收缴情况说明”统计
    *
    * @return
    */
-  public String creditFeeStats() {
-    put("creditFeeStats", entityDao.search(buildQuery()));
+  public String stat1() {
+    List<Department> departments = getDeparts();
+
+    Map<Number, Department> departmentMap = CollectUtils.newHashMap();
+
+    for (Department department : departments) {
+      departmentMap.put(department.getId(), department);
+    }
+
+    OqlBuilder<Object[]> builder = OqlBuilder.from(FeeDetail.class.getName() + " feeDetail");
+    builder.where("feeDetail.semester.id in (:semesterId)", getIntIds("semester"));
+    builder.groupBy("feeDetail.std.state.department.id");
+    builder
+        .select("feeDetail.std.state.department.id,sum(case when feeDetail.payed is not null and feeDetail.payed > 0 then 1 else 0 end),sum(case when feeDetail.payed is not null or feeDetail.payed > 0 then feeDetail.payed else 0 end),count(*)");
+    List<Object[]> stats = entityDao.search(builder);
+    List<FeeStat1> results = CollectUtils.newArrayList();
+    for (Object[] data : stats) {
+      results.add(new FeeStat1(departmentMap.get(data[0]), (Number) data[1], (Number) data[2],
+          (Number) data[3]));
+    }
+    put("results", results);
     return forward();
   }
 
-  /**
-   * 获得“应-实 缴费不符统计”的查询条件
-   *
-   * @return
-   */
-  protected OqlBuilder<FeeDetail> buildStatFeeTypeQuery() {
+  public String detail1() {
     OqlBuilder<FeeDetail> builder = OqlBuilder.from(FeeDetail.class, "feeDetail");
-    populateConditions(builder);
-    if (CollectUtils.isNotEmpty(getStdTypes())) {
-      builder.where("feeDetail.std.stdType in (:stdTypes)", getStdTypes());
+    builder.where("feeDetail.std.project in (:project)", getProject());
+    builder.where("feeDetail.std.state.department in (:departs)", getDeparts());
+    List<EduSpan> spans = getSpans();
+    if (CollectUtils.isNotEmpty(spans)) {
+      builder.where("feeDetail.std.span in (:spans)", spans);
     }
-    builder.where("feeDetail.semester.id = :semesterId", getIntId("semester"));
-    builder.groupBy("feeDetail.std.id, feeDetail.type.id");
-    builder.having("sum(feeDetail.shouldPay) <> sum(feeDetail.payed)");
-    builder.select("new " + FeeTypeStat.class.getName()
-        + "(feeDetail.std.id, feeDetail.type.id, sum(feeDetail.shouldPay), sum(feeDetail.payed))");
-    builder.limit(getPageLimit());
-    builder.orderBy(Order.parse(get("orderBy")));
-    return builder;
-  }
-
-  /**
-   * 获得“学费－学分 不符统计”的查询条件
-   *
-   * @return
-   */
-  protected OqlBuilder<CreditFeeStat> buildCreditFeeQuery() {
-    OqlBuilder<CreditFeeStat> builder = OqlBuilder.from(CreditFeeStat.class, "creditFeeStat");
-    populateConditions(builder);
-    builder.where("feeDetail.std.project=:project", getProject());
-    builder.where("feeDetail.std.state.department in (:departments)", getDeparts());
-    if (CollectUtils.isNotEmpty(getStdTypes())) {
-      builder.where("feeDetail.std.stdType in (:stdTypes)", getStdTypes());
-    }
-    if (CollectUtils.isNotEmpty(getSpans())) {
-      builder.where("feeDetail.std.span in (:spans)", getSpans());
-    }
-    builder.limit(getPageLimit());
-    builder.orderBy(Order.parse(get("orderBy")));
-    return builder;
-  }
-
-  /**
-   * 根据indexPage选择查询条件收集的方法
-   *
-   * @return
-   */
-  protected <T extends Entity<?>> OqlBuilder<T> buildQuery() {
-    if (StringUtils.isEmpty(get("indexPage")) || get("indexPage").equals("statFeeType")) {
-      return (OqlBuilder<T>) buildStatFeeTypeQuery();
+    builder.where("feeDetail.std.state.department.id = (:departmentId)", getIntId("department"));
+    builder.where("feeDetail.semester.id in (:semesterIds)", getIntIds("semester"));
+    builder.where("feeDetail.payed is null or feeDetail.payed = 0");
+    String orderBy = get("orderBy");
+    if (StringUtils.isBlank(orderBy)) {
+      orderBy = "feeDetail.id";
     } else {
-      return (OqlBuilder<T>) buildCreditFeeQuery();
+      orderBy += ",feeDetail.id";
     }
-  }
-
-  /**
-   * 组建FeeTypeStat对象
-   *
-   * @param accounts
-   */
-  private void fillStudentAndFeeType(List<FeeTypeStat> accounts) {
-    List<Student> stds = CollectUtils.newArrayList();
-    List<FeeType> feeTypes = CollectUtils.newArrayList();
-    for (FeeTypeStat stat : accounts) {
-      stds.add(stat.getStd());
-      feeTypes.add(stat.getType());
-    }
-    Map<Long, Student> stdMap = EntityUtils.instance(entityDao).queryToMap(Student.class, stds);
-    Map<Integer, FeeType> feeTypeMap = EntityUtils.instance(entityDao).queryToMap(FeeType.class, feeTypes);
-    for (FeeTypeStat stat : accounts) {
-      stat.setStd(stdMap.get(stat.getStd().getId()));
-      stat.setType(feeTypeMap.get(stat.getType().getId()));
-    }
+    builder.orderBy(Order.parse(orderBy));
+    put("feeDetails", entityDao.search(builder));
+    return forward();
   }
 }

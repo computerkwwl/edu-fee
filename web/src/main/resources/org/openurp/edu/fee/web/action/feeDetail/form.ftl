@@ -9,8 +9,9 @@
       [@b.field label="学号"]${feeDetail.std.user.code}[/@]
     [#else]
       [@b.textfield label="学号" name="userCode" value=(feeDetail.std.user.code)! required="true" maxlength="32" style=elementSTYLE comment="在左边输入学号后，点击页面空白处，即可获取该学生信息"/]
+      <input type="hidden" name="feeDetail.std.id" value=""/>
     [/#if]
-    [@b.field label="姓名"]<span id="fd_stdName" style="display: inline-block;">${(feeDetail.std.user.name)!}</span><input type="hidden" name="feeDetail.std.id" value=""/>[/@]
+    [@b.field label="姓名"]<span id="fd_stdName" style="display: inline-block;">${(feeDetail.std.user.name)!}</span>[/@]
     [@b.field label="专业"]<span id="fd_major" style="display: inline-block;">${(feeDetail.std.state.major.name)!}</span>[/@]
     [@b.field label="班级"]<span id="fd_squad" style="display: inline-block;">${(feeDetail.std.state.squad.name)!}</span>[/@]
     [@b.field label="学历层次"]<span id="fd_span" style="display: inline-block;">${(feeDetail.std.span.name)!}</span>[/@]

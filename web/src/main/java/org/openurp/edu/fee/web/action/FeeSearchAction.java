@@ -30,6 +30,7 @@ import org.beangle.commons.dao.query.builder.Condition;
 import org.beangle.commons.dao.query.builder.OqlBuilder;
 import org.beangle.struts2.helper.Params;
 import org.beangle.struts2.helper.QueryHelper;
+import org.openurp.edu.base.code.model.EduSpan;
 import org.openurp.edu.base.code.model.FeeType;
 import org.openurp.edu.base.model.Student;
 import org.openurp.edu.fee.model.FeeDetail;
@@ -74,9 +75,11 @@ public class FeeSearchAction extends SemesterSupportAction {
   protected OqlBuilder<FeeDetail> buildQuery() {
     OqlBuilder<FeeDetail> builder = OqlBuilder.from(FeeDetail.class, "feeDetail");
     populateConditions(builder, "feeDetail.std.stdType.id,feeDetail.semester.studentType.id");
+    builder.where("feeDetail.std.project in (:project)", getProject());
     builder.where("feeDetail.std.state.department in (:departs)", getDeparts());
-    if (CollectUtils.isNotEmpty(getStdTypes())) {
-      builder.where("feeDetail.std.stdType in (:stdTypes)", getStdTypes());
+    List<EduSpan> spans = getSpans();
+    if (CollectUtils.isNotEmpty(spans)) {
+      builder.where("feeDetail.std.span in (:spans)", spans);
     }
     List<Condition> conditions = QueryHelper.extractConditions(Student.class, "std", null);
     String className = get("className");
@@ -88,9 +91,11 @@ public class FeeSearchAction extends SemesterSupportAction {
       builder.where("std.state.squad.name = :squadName", className);
     }
     builder.limit(getPageLimit());
-    String orderBy = get("byWhat");
-    if (StringUtils.isEmpty(orderBy)) {
-      orderBy = get("orderBy");
+    String orderBy = get("orderBy");
+    if (StringUtils.isBlank(orderBy)) {
+      orderBy = "feeDetail.id";
+    } else {
+      orderBy += ",feeDetail.id";
     }
     builder.orderBy(Order.parse(orderBy));
     return builder;

@@ -11,6 +11,5 @@
     <mapping class="org.openurp.edu.fee.model.FeeDetail"/>
     <mapping class="org.openurp.edu.fee.model.FeeDefault"/>
     <mapping class="org.openurp.edu.fee.model.CreditFeeDefault"/>
-    <mapping class="org.openurp.edu.fee.model.stat.CreditFeeStat"/>
   </session-factory>
 </hibernate-configuration>
