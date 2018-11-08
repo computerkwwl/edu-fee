@@ -27,7 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.beangle.commons.dao.impl.BaseServiceImpl;
 import org.beangle.commons.dao.query.builder.OqlBuilder;
 import org.openurp.base.model.Department;
-import org.openurp.edu.base.code.model.EduSpan;
+import org.openurp.code.edu.model.EducationLevel;
 import org.openurp.edu.base.code.model.FeeType;
 import org.openurp.edu.base.model.Major;
 import org.openurp.edu.base.model.Student;
@@ -39,7 +39,7 @@ public class FeeDefaultServiceImpl extends BaseServiceImpl implements FeeDefault
   private FeeDefaultService feeDefaultService;
 
   public FeeDefault getFeeDefault(Student std, FeeType type) {
-    List<FeeDefault> feeDefaults = feeDefaultService.getFeeDefaults(type, Arrays.asList(std.getSpan()),
+    List<FeeDefault> feeDefaults = feeDefaultService.getFeeDefaults(type, Arrays.asList(std.getLevel()),
         std.getDepartment(), std.getMajor());
     if (CollectionUtils.isEmpty(feeDefaults)) {
       return null;
@@ -47,7 +47,7 @@ public class FeeDefaultServiceImpl extends BaseServiceImpl implements FeeDefault
     Collections.sort(feeDefaults, new Comparator<FeeDefault>() {
 
       public int compare(FeeDefault fd1, FeeDefault fd2) {
-        int rs = fd1.getEduSpan().getId().compareTo(fd2.getEduSpan().getId());
+        int rs = fd1.getLevel().getId().compareTo(fd2.getLevel().getId());
         if (rs == 0) {
           if (null == fd1.getMajor() && null != fd2.getMajor()) {
             return 1;
@@ -62,12 +62,12 @@ public class FeeDefaultServiceImpl extends BaseServiceImpl implements FeeDefault
   }
 
   @Override
-  public List<FeeDefault> getFeeDefaults(FeeType feeType, List<EduSpan> eduSpans, Department department,
+  public List<FeeDefault> getFeeDefaults(FeeType feeType, List<EducationLevel> levels, Department department,
       Major major) {
     OqlBuilder<FeeDefault> builder = OqlBuilder.from(FeeDefault.class, "feeDefault");
     builder.where("feeDefault.type = :feeType", feeType);
     builder.where("feeDefault.department = :department", department);
-    builder.where("feeDefault.eduSpan in (:eduSpans)", eduSpans);
+    builder.where("feeDefault.level in (:levels)", levels);
     if (null != major) {
       builder.where("feeDefault.major is null or feeDefault.major = :major", major);
     }

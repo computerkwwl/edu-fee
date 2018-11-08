@@ -7,7 +7,7 @@
     [#assign elementSTYLE = "width: 200px"/]
     [#assign s = "feeDefault_"/]
     <input id="${s}project" type="hidden" name="project.id" value="${project.id}"/>
-    [@b.select id=s + "span" label="学历层次" name="feeDefault.eduSpan.id" items=[] empty="..." required="true" style=elementSTYLE/]
+    [@b.select id=s + "span" label="学历层次" name="feeDefault.level.id" items=[] empty="..." required="true" style=elementSTYLE/]
     [@b.select id=s + "department" label="院系所" name="feeDefault.department.id" items=[] empty="..." required="true" style=elementSTYLE/]
     [@b.select id=s + "major" label="专业" name="feeDefault.major.id" items=[] empty="..." style=elementSTYLE/]
     [@b.select label="交费类型" name="feeDefault.type.id" items=feeTypes?sort_by(["name"]) value=(feeDefault.type.id)! empty="..." required="true" style=elementSTYLE/]
@@ -33,7 +33,7 @@
         sds.init([ { "id": "${project.id}", "name": "" }, "${request.getServletPath()}" ]);
         console.log(sds);
 
-        form["feeDefault.eduSpan.id"].value = "${(feeDefault.eduSpan.id)!}";
+        form["feeDefault.level.id"].value = "${(feeDefault.level.id)!}";
         form["feeDefault.department.id"].value = "${(feeDefault.department.id)!}";
         form["feeDefault.major.id"].value = "${(feeDefault.major.id)!}";
       }

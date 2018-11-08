@@ -6,10 +6,10 @@
   [@b.form name="creditFeeDefaultForm" action="!save" target="creditFeeDefaults" theme="list"]
     [#assign elementSTYLE = "width: 200px"/]
     [#assign s = "creditFeeDefault_"/]
-    [@b.select id=s + "span" label="学历层次" name="creditFeeDefault.eduSpan.id" items=eduSpans empty="..." required="true" style=elementSTYLE/]
+    [@b.select id=s + "span" label="学历层次" name="creditFeeDefault.level.id" items=levels empty="..." required="true" style=elementSTYLE/]
     [@b.select label="课程类别" name="creditFeeDefault.courseType.id" items=courseTypes?sort_by(["name"]) value=(creditFeeDefault.courseType.id)! empty="..." style=elementSTYLE/]
     [@b.validity]
-      $("[name='creditFeeDefault.eduSpan.id']", document.creditFeeDefaultForm).require().assert(function() {
+      $("[name='creditFeeDefault.level.id']", document.creditFeeDefaultForm).require().assert(function() {
         var isOk = false;
 
         $.ajax({
@@ -19,7 +19,7 @@
           "dataType": "json",
           "data": {
             "id": document.creditFeeDefaultForm["creditFeeDefault.id"].value,
-            "spanId": document.creditFeeDefaultForm["creditFeeDefault.eduSpan.id"].value,
+            "spanId": document.creditFeeDefaultForm["creditFeeDefault.level.id"].value,
             "typeId": document.creditFeeDefaultForm["creditFeeDefault.courseType.id"].value
           },
           "success": function(data) {

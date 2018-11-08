@@ -72,7 +72,7 @@
       [#list feeDefaults as feeDetault]
       <tr style="text-align: left">
         <td style="text-align: right">${feeDetault_index + 1}</td>
-        <td>${feeDetault.eduSpan.name}</td>
+        <td>${feeDetault.level.name}</td>
         <td>${feeDetault.department.name}</td>
         <td>${feeDetault.major.name}</td>
         <td>${feeDetault.type.name}</td>

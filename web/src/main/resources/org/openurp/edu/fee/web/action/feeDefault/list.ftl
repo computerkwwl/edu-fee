@@ -11,7 +11,7 @@
     [/@]
     [@b.row]
       [@b.boxcol/]
-      [@b.col title="学历层次" property="eduSpan.name" width="100px"/]
+      [@b.col title="学历层次" property="level.name" width="100px"/]
       [@b.col title="院系所" property="department.name" width="100px"/]
       [@b.col title="专业" property="major.name"]${feeDefault.major.name}[/@]
       [@b.col title="收费类别" property="type.name" width="100px"/]

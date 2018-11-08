@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 
 import org.beangle.commons.entity.pojo.NumberIdObject;
 import org.openurp.base.model.Department;
-import org.openurp.edu.base.code.model.EduSpan;
+import org.openurp.code.edu.model.EducationLevel;
 import org.openurp.edu.base.code.model.FeeType;
 import org.openurp.edu.base.model.Major;
 
@@ -34,7 +34,6 @@ import org.openurp.edu.base.model.Major;
  * 收费缺省值
  *
  * @author chenweixiong,chaostone
- *
  */
 @Entity(name = "org.openurp.edu.fee.model.FeeDefault")
 public class FeeDefault extends NumberIdObject<Integer> {
@@ -44,7 +43,7 @@ public class FeeDefault extends NumberIdObject<Integer> {
   /** 学历层次（原：学生类别） */
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
-  private EduSpan eduSpan;
+  private EducationLevel level;
 
   /** 系 */
   @NotNull
@@ -77,7 +76,7 @@ public class FeeDefault extends NumberIdObject<Integer> {
 
   /**
    * @param value
-   *            The value to set.
+   *          The value to set.
    */
   public void setValue(Integer defaultValue) {
     this.value = defaultValue;
@@ -92,7 +91,7 @@ public class FeeDefault extends NumberIdObject<Integer> {
 
   /**
    * @param type
-   *            The type to set.
+   *          The type to set.
    */
   public void setType(FeeType feeType) {
     this.type = feeType;
@@ -107,25 +106,25 @@ public class FeeDefault extends NumberIdObject<Integer> {
 
   /**
    * @param remark
-   *            The remark to set.
+   *          The remark to set.
    */
   public void setRemark(String remark) {
     this.remark = remark;
   }
 
   /**
-   * @return Returns the eduSpan.
+   * @return Returns the level.
    */
-  public EduSpan getEduSpan() {
-    return eduSpan;
+  public EducationLevel getLevel() {
+    return level;
   }
 
   /**
    * @param stdType
-   *            The eduSpan to set.
+   *          The level to set.
    */
-  public void setEduSpan(EduSpan eduSpan) {
-    this.eduSpan = eduSpan;
+  public void setLevel(EducationLevel level) {
+    this.level = level;
   }
 
   public Department getDepartment() {

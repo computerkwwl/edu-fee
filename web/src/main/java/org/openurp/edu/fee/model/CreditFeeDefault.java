@@ -24,8 +24,8 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import org.beangle.commons.entity.pojo.NumberIdObject;
+import org.openurp.code.edu.model.EducationLevel;
 import org.openurp.edu.base.code.model.CourseType;
-import org.openurp.edu.base.code.model.EduSpan;
 
 /**
  * 学分收费标准
@@ -41,7 +41,7 @@ public class CreditFeeDefault extends NumberIdObject<Integer> {
   /** 学历层次（原：学生类别） */
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
-  private EduSpan eduSpan;
+  private EducationLevel level;
 
   /** 课程类别 */
   @ManyToOne(fetch = FetchType.LAZY)
@@ -58,12 +58,12 @@ public class CreditFeeDefault extends NumberIdObject<Integer> {
     this.courseType = courseType;
   }
 
-  public EduSpan getEduSpan() {
-    return eduSpan;
+  public EducationLevel getLevel() {
+    return level;
   }
 
-  public void setEduSpan(EduSpan eduSpan) {
-    this.eduSpan = eduSpan;
+  public void setLevel(EducationLevel level) {
+    this.level = level;
   }
 
   public Float getValue() {

@@ -11,7 +11,7 @@
     [/@]
     [@b.row]
       [@b.boxcol/]
-      [@b.col title="学历层次" property="eduSpan.name" width="220px"/]
+      [@b.col title="学历层次" property="level.name" width="220px"/]
       [@b.col title="课程类别" property="courseType.name" width="270px"/]
       [@b.col title="学费（分/元）" property="value"]${(cfd.value?string("0.00"))!"0.00"}[/@]
     [/@]

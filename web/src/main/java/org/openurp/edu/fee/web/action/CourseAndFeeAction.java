@@ -50,8 +50,8 @@ public class CourseAndFeeAction extends SemesterSupportAction {
     if (CollectUtils.isNotEmpty(getStdTypes())) {
       builder.where("student.stdType in (:stdTypes)", getStdTypes());
     }
-    if (CollectUtils.isNotEmpty(getSpans())) {
-      builder.where("student.span in (:spans)", getSpans());
+    if (CollectUtils.isNotEmpty(getLevels())) {
+      builder.where("student.level in (:levels)", getLevels());
     }
     builder.limit(getPageLimit());
     builder.orderBy(Order.parse(get("orderBy")));

@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.beangle.commons.collection.CollectUtils;
 import org.beangle.commons.collection.Order;
 import org.beangle.commons.dao.query.builder.OqlBuilder;
-import org.openurp.edu.base.code.model.EduSpan;
+import org.openurp.code.edu.model.EducationLevel;
 import org.openurp.edu.base.code.model.FeeType;
 import org.openurp.edu.fee.model.FeeDefault;
 import org.openurp.edu.web.action.SemesterSupportAction;
@@ -46,9 +46,9 @@ public class FeeDefaultAction extends SemesterSupportAction {
     OqlBuilder<FeeDefault> builder = OqlBuilder.from(FeeDefault.class, "feeDefault");
     populateConditions(builder);
     builder.where("feeDefault.department in (:departments)", getDeparts());
-    List<EduSpan> spans = getSpans();
+    List<EducationLevel> spans = getLevels();
     if (CollectUtils.isNotEmpty(spans)) {
-      builder.where("feeDefault.eduSpan in (:eduSpans)", spans);
+      builder.where("feeDefault.level in (:levels)", spans);
     }
     builder.limit(getPageLimit());
     String orderBy = get("orderBy");
@@ -110,7 +110,7 @@ public class FeeDefaultAction extends SemesterSupportAction {
   public String printReview() {
     put("feeDefaults",
         entityDao.search(OqlBuilder.from(FeeDefault.class, "feeDefault").orderBy(
-            Order.parse("feeDefault.eduSpan.code, feeDefault.department.name, feeDefault.type.name"))));
+            Order.parse("feeDefault.level.code, feeDefault.department.name, feeDefault.type.name"))));
     return forward();
   }
 }

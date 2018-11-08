@@ -10,7 +10,7 @@
               [@eams.semesterCalendar theme="html" style="width:100px" id="f_semester" label="学年学期" value=curSemester name="feeDetail.semester.id" items=semesters/]
             <td>
           </tr>
-          [@b.select label="学历层次" items=spans?sort_by("code") empty="..."  name="feeDetail.std.span.id"/]
+          [@b.select label="学历层次" items=levels?sort_by("code") empty="..."  name="feeDetail.std.level.id"/]
           [@b.textfields names="feeDetail.std.user.code;学号,feeDetail.std.user.name;姓名,feeDetail.invoiceCode;发票"/]
           [@b.select label="收费类型" items=feeTypes?sort_by("code") empty="..."  name="feeDetail.type.id"/]
         [/@]

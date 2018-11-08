@@ -14,7 +14,7 @@
     [@b.field label="姓名"]<span id="fd_stdName" style="display: inline-block;">${(feeDetail.std.user.name)!}</span>[/@]
     [@b.field label="专业"]<span id="fd_major" style="display: inline-block;">${(feeDetail.std.state.major.name)!}</span>[/@]
     [@b.field label="班级"]<span id="fd_squad" style="display: inline-block;">${(feeDetail.std.state.squad.name)!}</span>[/@]
-    [@b.field label="学历层次"]<span id="fd_span" style="display: inline-block;">${(feeDetail.std.span.name)!}</span>[/@]
+    [@b.field label="学历层次"]<span id="fd_level" style="display: inline-block;">${(feeDetail.std.level.name)!}</span>[/@]
     [@b.field label="院系"]<span id="fd_department" style="display: inline-block;">${(feeDetail.std.state.department.name)!}</span>[/@]
     [#if (feeDetail.id)?exists]
       [@b.field label="学年学期"]<span style="display: inline-block;">${feeDetail.semester.schoolYear}${feeDetail.semester.name}</span>[/@]
@@ -44,14 +44,14 @@
         var stdNameObj = formObj.find("#fd_stdName");
         var majorObj = formObj.find("#fd_major");
         var squadObj = formObj.find("#fd_squad");
-        var spanObj = formObj.find("#fd_span");
+        var levelObj = formObj.find("#fd_level");
         var departmentObj = formObj.find("#fd_department");
 
         formObj.find("[name=userCode]").blur(function() {
           stdNameObj.empty();
           majorObj.empty();
           squadObj.empty();
-          spanObj.empty();
+          levelObj.empty();
           departmentObj.empty();
           form["feeDetail.std.id"].value = "";
 
@@ -73,7 +73,7 @@
                   stdNameObj.text(data.user.name);
                   majorObj.text(data.state.major.name);
                   squadObj.text(data.state.squad.name);
-                  spanObj.text(data.span.name);
+                  levelObj.text(data.level.name);
                   departmentObj.text(data.state.department.name);
                   form["feeDetail.std.id"].value = data.id;
                 } else {

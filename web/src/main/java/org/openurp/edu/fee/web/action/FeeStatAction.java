@@ -27,7 +27,7 @@ import org.beangle.commons.collection.CollectUtils;
 import org.beangle.commons.collection.Order;
 import org.beangle.commons.dao.query.builder.OqlBuilder;
 import org.openurp.base.model.Department;
-import org.openurp.edu.base.code.model.EduSpan;
+import org.openurp.code.edu.model.EducationLevel;
 import org.openurp.edu.base.model.Semester;
 import org.openurp.edu.fee.data.FeeStat1;
 import org.openurp.edu.fee.model.FeeDetail;
@@ -88,7 +88,7 @@ public class FeeStatAction extends SemesterSupportAction {
     OqlBuilder<FeeDetail> builder = OqlBuilder.from(FeeDetail.class, "feeDetail");
     builder.where("feeDetail.std.project in (:project)", getProject());
     builder.where("feeDetail.std.state.department in (:departs)", getDeparts());
-    List<EduSpan> spans = getSpans();
+    List<EducationLevel> spans = getLevels();
     if (CollectUtils.isNotEmpty(spans)) {
       builder.where("feeDetail.std.span in (:spans)", spans);
     }

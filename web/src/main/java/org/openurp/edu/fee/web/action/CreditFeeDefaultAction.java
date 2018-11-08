@@ -25,15 +25,15 @@ import org.beangle.commons.collection.CollectUtils;
 import org.beangle.commons.collection.Order;
 import org.beangle.commons.dao.query.builder.OqlBuilder;
 import org.beangle.commons.entity.Entity;
+import org.openurp.code.edu.model.EducationLevel;
 import org.openurp.edu.base.code.model.CourseType;
-import org.openurp.edu.base.code.model.EduSpan;
 import org.openurp.edu.fee.model.CreditFeeDefault;
 import org.openurp.edu.web.action.RestrictionSupportAction;
 
 public class CreditFeeDefaultAction extends RestrictionSupportAction {
 
   protected void indexSetting() {
-    put("eduSpans", getSpans());
+    put("levels", getLevels());
   }
 
   @Override
@@ -48,9 +48,9 @@ public class CreditFeeDefaultAction extends RestrictionSupportAction {
    */
   protected OqlBuilder<CreditFeeDefault> buildQuery() {
     OqlBuilder<CreditFeeDefault> builder = OqlBuilder.from(CreditFeeDefault.class, "cfd");
-    List<EduSpan> spans = getSpans();
+    List<EducationLevel> spans = getLevels();
     if (CollectUtils.isNotEmpty(spans)) {
-      builder.where("cfd.eduSpan in (:eduSpans)", spans);
+      builder.where("cfd.level in (:levels)", spans);
     }
     builder.limit(getPageLimit());
     builder.orderBy(Order.parse(get("orderBy")));
@@ -75,7 +75,7 @@ public class CreditFeeDefaultAction extends RestrictionSupportAction {
     if (null != id) {
       builder.where("cfd.id != :id", id);
     }
-    builder.where("cfd.eduSpan.id = :spanId", spanId);
+    builder.where("cfd.level.id = :spanId", spanId);
     if (null != typeId) {
       builder.where("cfd.courseType.id is null or cfd.courseType.id = :typeId", typeId);
     }
@@ -94,10 +94,10 @@ public class CreditFeeDefaultAction extends RestrictionSupportAction {
     if (creditFeeDefault.getCourseType() == null || creditFeeDefault.getCourseType().getId() == null
         || creditFeeDefault.getCourseType().getId().longValue() == 0) {
       creditFeeDefault.setCourseType(null);
-      builder.where("creditFeeDefault.eduSpan = :eduSpan", creditFeeDefault.getEduSpan());
+      builder.where("creditFeeDefault.level = :level", creditFeeDefault.getLevel());
       builder.where("creditFeeDefault.courseType is null");
     } else {
-      builder.where("creditFeeDefault.eduSpan = :eduSpan", creditFeeDefault.getEduSpan());
+      builder.where("creditFeeDefault.level = :level", creditFeeDefault.getLevel());
       builder.where("creditFeeDefault.courseType is :courseType", creditFeeDefault.getCourseType());
     }
     List<CreditFeeDefault> defaults = entityDao.search(builder);

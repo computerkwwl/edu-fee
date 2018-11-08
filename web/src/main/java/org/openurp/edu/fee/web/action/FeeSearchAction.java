@@ -30,7 +30,7 @@ import org.beangle.commons.dao.query.builder.Condition;
 import org.beangle.commons.dao.query.builder.OqlBuilder;
 import org.beangle.struts2.helper.Params;
 import org.beangle.struts2.helper.QueryHelper;
-import org.openurp.edu.base.code.model.EduSpan;
+import org.openurp.code.edu.model.EducationLevel;
 import org.openurp.edu.base.code.model.FeeType;
 import org.openurp.edu.base.model.Student;
 import org.openurp.edu.fee.model.FeeDetail;
@@ -47,7 +47,7 @@ public class FeeSearchAction extends SemesterSupportAction {
   protected FeeDetailService feeDetailService;
 
   public void indexSetting() {
-    put("spans", getSpans());
+    put("levels", getLevels());
     put("feeTypes", codeService.getCodes(FeeType.class));
   }
 
@@ -77,7 +77,7 @@ public class FeeSearchAction extends SemesterSupportAction {
     populateConditions(builder, "feeDetail.std.stdType.id,feeDetail.semester.studentType.id");
     builder.where("feeDetail.std.project in (:project)", getProject());
     builder.where("feeDetail.std.state.department in (:departs)", getDeparts());
-    List<EduSpan> spans = getSpans();
+    List<EducationLevel> spans = getLevels();
     if (CollectUtils.isNotEmpty(spans)) {
       builder.where("feeDetail.std.span in (:spans)", spans);
     }

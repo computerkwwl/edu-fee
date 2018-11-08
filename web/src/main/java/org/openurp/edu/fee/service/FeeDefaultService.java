@@ -21,7 +21,7 @@ package org.openurp.edu.fee.service;
 import java.util.List;
 
 import org.openurp.base.model.Department;
-import org.openurp.edu.base.code.model.EduSpan;
+import org.openurp.code.edu.model.EducationLevel;
 import org.openurp.edu.base.code.model.FeeType;
 import org.openurp.edu.base.model.Major;
 import org.openurp.edu.base.model.Student;
@@ -50,6 +50,6 @@ public interface FeeDefaultService {
    *            否则不考虑该条件
    * @return
    */
-  public List<FeeDefault> getFeeDefaults(FeeType feeType, List<EduSpan> eduSpans, Department department,
+  public List<FeeDefault> getFeeDefaults(FeeType feeType, List<EducationLevel> levels, Department department,
       Major major);
 }

@@ -71,7 +71,7 @@
       <tr>
         <td style="text-align: right">${cfd_index + 1}</td>
         <td>${cfd.courseType.name}</td>
-        <td>${cfd.eduSpan.name}</td>
+        <td>${cfd.level.name}</td>
         <td>${(cfd.value?string("0.00"))!"0.00"}</td>
       </tr>
       [/#list]
