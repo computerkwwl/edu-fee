@@ -77,9 +77,9 @@ public class FeeSearchAction extends SemesterSupportAction {
     populateConditions(builder, "feeDetail.std.stdType.id,feeDetail.semester.studentType.id");
     builder.where("feeDetail.std.project in (:project)", getProject());
     builder.where("feeDetail.std.state.department in (:departs)", getDeparts());
-    List<EducationLevel> spans = getLevels();
-    if (CollectUtils.isNotEmpty(spans)) {
-      builder.where("feeDetail.std.span in (:spans)", spans);
+    List<EducationLevel> levels = getLevels();
+    if (CollectUtils.isNotEmpty(levels)) {
+      builder.where("feeDetail.std.level in (:levels)", levels);
     }
     List<Condition> conditions = QueryHelper.extractConditions(Student.class, "std", null);
     String className = get("className");
