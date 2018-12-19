@@ -1,7 +1,7 @@
 /*
  * OpenURP, Agile University Resource Planning Solution.
  *
- * Copyright (c) 2005, The OpenURP Software.
+ * Copyright © 2014, The OpenURP Software.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +41,14 @@ import org.springframework.util.CollectionUtils;
  */
 public class ImporterListenerUtils {
 
+  public static <T> T getValue(AbstractItemImporter importer, String attr) {
+    return (T) importer.getCurData().get(attr);
+  }
+
+  public static <T> T getValue(AbstractItemImporter importer, String attr, Class<T> returnType) {
+    return (T) importer.getCurData().get(attr);
+  }
+
   /**
    * 检查并转换获得对象
    *
@@ -55,7 +63,7 @@ public class ImporterListenerUtils {
   public static <T extends Entity<?>> T checkAndConvertObject(EntityDao entityDao, TransferResult tr,
       AbstractItemImporter importer, Class<T> clazz, String attr, boolean allowNull, Map<String, T> objectMap) {
     // 根据指定的字段(attr)从模板上读取数值(objectKeyValue)
-    String objectKeyValue = (String) importer.getCurData().get(attr);
+    String objectKeyValue = getValue(importer, attr);
     if (allowNull && StringUtils.isBlank(objectKeyValue) || null == tr || null == clazz
         || StringUtils.isBlank(attr)) {
       return null;
@@ -131,7 +139,7 @@ public class ImporterListenerUtils {
       Class<T> clazz, String attr, boolean allowNull, Integer numForward, boolean isConvert,
       String[] defaultValues) {
     // 根据指定的字段(attr)从模板上读取数值(attrValue)
-    Object attrValue = importer.getCurData().get(attr);
+    Object attrValue = getValue(importer, attr);
     if (allowNull && StringUtils.isBlank(String.valueOf(attrValue)) || null == tr || null == clazz
         || StringUtils.isBlank(attr) || null != numForward && (-2 > numForward || 2 < numForward)) {
       return null;
@@ -184,7 +192,7 @@ public class ImporterListenerUtils {
   public static <T extends Object> T checkIsEmpty(TransferResult tr, AbstractItemImporter importer,
       Class<T> clazz, String attr, boolean allowNull, boolean isConvert, String format, String[] defaultValues) {
     // 根据指定的字段(attr)从模板上读取数值(attrValue)
-    String attrValue = (String) importer.getCurData().get(attr);
+    String attrValue = getValue(importer, attr);
     if (allowNull && StringUtils.isBlank(String.valueOf(attrValue)) || null == tr || null == clazz
         || StringUtils.isBlank(attr)) {
       return null;

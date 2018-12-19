@@ -1,7 +1,7 @@
 /*
  * OpenURP, Agile University Resource Planning Solution.
  *
- * Copyright (c) 2005, The OpenURP Software.
+ * Copyright © 2014, The OpenURP Software.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import org.beangle.commons.inject.bind.AbstractBindModule;
 import org.openurp.edu.fee.service.FeeDetailImportListener;
 import org.openurp.edu.fee.service.TuitionFeeImportListener;
 import org.openurp.edu.fee.service.impl.FeeDefaultServiceImpl;
+import org.openurp.edu.fee.service.impl.FeeDetailServiceImpl;
 import org.openurp.edu.fee.service.impl.TuitionFeeServiceImpl;
 import org.openurp.edu.fee.web.action.CourseAndFeeAction;
 import org.openurp.edu.fee.web.action.CreditFeeDefaultAction;
@@ -36,7 +37,6 @@ import org.openurp.edu.fee.web.action.TuitionFeeAction;
 
 /**
  * @author zhouqi 2018年9月27日
- *
  */
 public class FeeModule extends AbstractBindModule {
 
@@ -44,6 +44,7 @@ public class FeeModule extends AbstractBindModule {
   protected void doBinding() {
     bind("feeDefaultService", FeeDefaultServiceImpl.class);
     bind("tuitionFeeService", TuitionFeeServiceImpl.class);
+    bind("feeDetailService", FeeDetailServiceImpl.class);
 
     bind(SquadAndFeeAction.class, CourseAndFeeAction.class, CreditFeeDefaultAction.class,
         FeeDefaultAction.class, FeeDefaultConfigAction.class, FeeSearchAction.class, FeeOfStdAction.class,

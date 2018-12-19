@@ -1,7 +1,7 @@
 /*
  * OpenURP, Agile University Resource Planning Solution.
  *
- * Copyright (c) 2005, The OpenURP Software.
+ * Copyright © 2014, The OpenURP Software.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,16 +69,17 @@ public class FeeOfStdAction extends RestrictionSupportAction {
       semester = entityDao.get(Semester.class, semesterId);
       put("conditionSemester", semester);
     }
-    List<FeeDetail> fees = feeDetailService.getFeeDetails(std, semester, type);
-    Set<FeeType> feeTypes = CollectUtils.newHashSet();
-    Set<Semester> semesters = CollectUtils.newHashSet();
-    for (FeeDetail feeDetail : fees) {
-      feeTypes.add(feeDetail.getType());
-      semesters.add(feeDetail.getSemester());
-    }
-    put("fees", fees);
-    put("feeTypes", feeTypes);
-    put("semesters", semesters);
+    // FIXME 2018-12-19 zhouqi 下面代码需要调整
+//    List<FeeDetail> fees = feeDetailService.getFeeDetails(std, semester, type);
+//    Set<FeeType> feeTypes = CollectUtils.newHashSet();
+//    Set<Semester> semesters = CollectUtils.newHashSet();
+//    for (FeeDetail feeDetail : fees) {
+//      feeTypes.add(feeDetail.getType());
+//      semesters.add(feeDetail.getSemester());
+//    }
+//    put("fees", fees);
+//    put("feeTypes", feeTypes);
+//    put("semesters", semesters);
     return forward();
   }
 

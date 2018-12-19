@@ -1,7 +1,7 @@
 /*
  * OpenURP, Agile University Resource Planning Solution.
  *
- * Copyright (c) 2005, The OpenURP Software.
+ * Copyright © 2014, The OpenURP Software.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ public class FeeSearchAction extends SemesterSupportAction {
 
   protected FeeDetailService feeDetailService;
 
-  public void indexSetting() {
+  protected void indexSetting() {
     put("levels", getLevels());
     put("feeTypes", codeService.getCodes(FeeType.class));
   }

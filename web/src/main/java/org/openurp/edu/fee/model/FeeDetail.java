@@ -1,7 +1,7 @@
 /*
  * OpenURP, Agile University Resource Planning Solution.
  *
- * Copyright (c) 2005, The OpenURP Software.
+ * Copyright © 2014, The OpenURP Software.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@ import javax.validation.constraints.Size;
 
 import org.openurp.base.model.Department;
 import org.openurp.base.model.NumberIdTimeObject;
-import org.openurp.edu.base.code.model.CurrencyCategory;
-import org.openurp.edu.base.code.model.FeeMode;
 import org.openurp.edu.base.code.model.FeeType;
 import org.openurp.edu.base.model.Semester;
 import org.openurp.edu.base.model.Student;
@@ -38,7 +36,6 @@ import org.openurp.edu.base.model.Student;
  * 收费明细信息
  *
  * @author chaostone
- *
  */
 @Entity(name = "org.openurp.edu.fee.model.FeeDetail")
 public class FeeDetail extends NumberIdTimeObject<Integer> {
@@ -49,10 +46,6 @@ public class FeeDetail extends NumberIdTimeObject<Integer> {
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
   private Student std;
-
-  /** hSK成绩 */
-  @Size(max = 50)
-  private String HSKGrade;
 
   /** 收费部门 */
   @NotNull
@@ -68,38 +61,24 @@ public class FeeDetail extends NumberIdTimeObject<Integer> {
   @ManyToOne(fetch = FetchType.LAZY)
   private FeeType type;
 
-  /** 收费方式 */
+  /** 应缴费用 */
   @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  private FeeMode mode;
-
-  /** 应缴费用（单位：人民币） */
   private Float shouldPay;
 
-  /** 货币类别 */
-  @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  private CurrencyCategory currencyCategory;
-
-  /** 汇率 */
-  private Float rate;
-
-  /** 实收金额(单位是货币类别) */
+  /** 实收金额 */
   private Float payed;
-
-  /** 折合成人民币 */
-  private Float toRMB;
 
   /** 学年度学期 */
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
   private Semester semester;
 
-  /** 收费人 */
+  /** 记录创建人 */
+  @NotNull
   @Size(max = 50)
   private String whoAdded;
 
-  /** 修改人 */
+  /** 上缴录入人 */
   @Size(max = 50)
   private String whoModified;
 
@@ -107,8 +86,9 @@ public class FeeDetail extends NumberIdTimeObject<Integer> {
   @Size(max = 500)
   private String remark;
 
-  /** 创建时间 */
-  private Date createdAt;
+  /** 实缴日期 */
+  @NotNull
+  private Date payedAt;
 
   public Semester getSemester() {
     return semester;
@@ -118,28 +98,12 @@ public class FeeDetail extends NumberIdTimeObject<Integer> {
     this.semester = semester;
   }
 
-  public CurrencyCategory getCurrencyCategory() {
-    return currencyCategory;
-  }
-
-  public void setCurrencyCategory(CurrencyCategory currencyCategory) {
-    this.currencyCategory = currencyCategory;
-  }
-
   public Department getDepart() {
     return depart;
   }
 
   public void setDepart(Department depart) {
     this.depart = depart;
-  }
-
-  public String getHSKGrade() {
-    return HSKGrade;
-  }
-
-  public void setHSKGrade(String HSKGrade) {
-    this.HSKGrade = HSKGrade;
   }
 
   public String getInvoiceCode() {
@@ -156,14 +120,6 @@ public class FeeDetail extends NumberIdTimeObject<Integer> {
 
   public void setPayed(Float payed) {
     this.payed = payed;
-  }
-
-  public Float getRate() {
-    return rate;
-  }
-
-  public void setRate(Float rate) {
-    this.rate = rate;
   }
 
   public String getRemark() {
@@ -190,14 +146,6 @@ public class FeeDetail extends NumberIdTimeObject<Integer> {
     this.std = std;
   }
 
-  public Float getToRMB() {
-    return toRMB;
-  }
-
-  public void setToRMB(Float toRMB) {
-    this.toRMB = toRMB;
-  }
-
   public FeeType getType() {
     return type;
   }
@@ -214,14 +162,6 @@ public class FeeDetail extends NumberIdTimeObject<Integer> {
     this.whoAdded = whoCharge;
   }
 
-  public FeeMode getMode() {
-    return mode;
-  }
-
-  public void setMode(FeeMode mode) {
-    this.mode = mode;
-  }
-
   public String getWhoModified() {
     return whoModified;
   }
@@ -230,12 +170,11 @@ public class FeeDetail extends NumberIdTimeObject<Integer> {
     this.whoModified = whoModified;
   }
 
-  public Date getCreatedAt() {
-    return createdAt;
+  public Date getPayedAt() {
+    return payedAt;
   }
 
-  public void setCreatedAt(Date createdAt) {
-    this.createdAt = createdAt;
+  public void setPayedAt(Date payedAt) {
+    this.payedAt = payedAt;
   }
-
 }

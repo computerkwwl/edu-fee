@@ -1,7 +1,7 @@
 /*
  * OpenURP, Agile University Resource Planning Solution.
  *
- * Copyright (c) 2005, The OpenURP Software.
+ * Copyright © 2014, The OpenURP Software.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public class ConditionUtils {
     int n = data.size() / splitLen + (data.size() % splitLen == 0 ? 0 : 1);
 
     StringBuilder hql = new StringBuilder();
-    List<Object> params = CollectUtils.newArrayList();
+    List<List<T>> params = CollectUtils.newArrayList();
     for (int i = 0; i < n; i++) {
       if (hql.length() > 0) {
         hql.append(" or ");
@@ -57,12 +57,12 @@ public class ConditionUtils {
       hql.append(fieldStr + " in (:" + StringUtils.remove(inStr, ":") + i + ")");
       if (n - 1 == i) {
         if (0 == i) {
-          params = CollectUtils.newArrayList(data);
+          params.add(data);
         } else {
-          params.add(data.subList(i * splitLen, data.size() - 1));
+          params.add(data.subList(i * splitLen, data.size()));
         }
       } else {
-        params.add(data.subList(i * splitLen, (i + 1) * (splitLen - 1)));
+        params.add(data.subList(i * splitLen, (i + 1) * splitLen));
       }
     }
     Condition condition = new Condition(hql.toString());

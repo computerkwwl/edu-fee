@@ -1,6 +1,16 @@
 [#ftl]
 [@b.head/]
-  [@b.toolbar title="收费信息维护"/]
+  [@b.toolbar title="收费信息维护"]
+    bar.addItem("初始化收费(名单)", function() {
+      var form = document.feeDefailSearchForm;
+      if (!form["feeDetail.semester.id"].value.trim().length) {
+        alert("请选择所要初始化的学年学期，谢谢！");
+        return false;
+      }
+      bg.form.submit(form, "${b.url("!initIndex")}", "main");
+    }, "${b.theme.iconurl("actions/new.png")}");
+  [/@]
+  [@b.messages slash="10"/]
   <table class="indexpanel">
     <tr>
       <td class="index_view">

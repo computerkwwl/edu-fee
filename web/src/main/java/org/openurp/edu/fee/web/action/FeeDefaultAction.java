@@ -1,7 +1,7 @@
 /*
  * OpenURP, Agile University Resource Planning Solution.
  *
- * Copyright (c) 2005, The OpenURP Software.
+ * Copyright © 2014, The OpenURP Software.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,14 +18,14 @@
  */
 package org.openurp.edu.fee.web.action;
 
-import java.util.List;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
-import org.beangle.commons.collection.CollectUtils;
 import org.beangle.commons.collection.Order;
 import org.beangle.commons.dao.query.builder.OqlBuilder;
-import org.openurp.code.edu.model.EducationLevel;
+import org.openurp.base.model.Department;
 import org.openurp.edu.base.code.model.FeeType;
+import org.openurp.edu.base.model.Major;
 import org.openurp.edu.fee.model.FeeDefault;
 import org.openurp.edu.web.action.SemesterSupportAction;
 
@@ -33,7 +33,6 @@ import org.openurp.edu.web.action.SemesterSupportAction;
  * 交费缺省值
  *
  * @author chenweixiong,chaostone
- *
  */
 public class FeeDefaultAction extends SemesterSupportAction {
 
@@ -45,11 +44,6 @@ public class FeeDefaultAction extends SemesterSupportAction {
   public String search() {
     OqlBuilder<FeeDefault> builder = OqlBuilder.from(FeeDefault.class, "feeDefault");
     populateConditions(builder);
-    builder.where("feeDefault.department in (:departments)", getDeparts());
-    List<EducationLevel> spans = getLevels();
-    if (CollectUtils.isNotEmpty(spans)) {
-      builder.where("feeDefault.level in (:levels)", spans);
-    }
     builder.limit(getPageLimit());
     String orderBy = get("orderBy");
     if (StringUtils.isBlank(orderBy)) {
@@ -68,12 +62,20 @@ public class FeeDefaultAction extends SemesterSupportAction {
    * @return
    */
   public String edit() {
-    FeeDefault feeDefault = populateEntity(FeeDefault.class, "feeDefault");
-    if (null != feeDefault) {
-      put("feeDefault", feeDefault);
+    Integer feeDefaultId = getIntId("feeDefault");
+    if (null != feeDefaultId) {
+      put("feeDefault", entityDao.get(FeeDefault.class, feeDefaultId));
     }
     put("feeTypes", codeService.getCodes(FeeType.class));
-    put("project", getProject());
+    put("levels", getLevels());
+    Date nowAt = new Date();
+    put("departments",
+        entityDao.search(OqlBuilder.from(Department.class, "department")
+            .where("department.beginOn <= :nowAt", nowAt)
+            .where("department.endOn is null or department.endOn >= :nowAt")));
+    put("majors",
+        entityDao.search(OqlBuilder.from(Major.class, "major").where("major.beginOn <= :nowAt", nowAt)
+            .where("major.endOn is null or major.endOn >= :nowAt")));
     return forward();
   }
 
@@ -85,7 +87,6 @@ public class FeeDefaultAction extends SemesterSupportAction {
   public String save() {
     entityDao.saveOrUpdate(populateEntity(FeeDefault.class, "feeDefault"));
     return redirect("search", "info.save.success");
-
   }
 
   /**

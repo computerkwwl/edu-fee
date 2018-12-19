@@ -1,7 +1,7 @@
 /*
  * OpenURP, Agile University Resource Planning Solution.
  *
- * Copyright (c) 2005, The OpenURP Software.
+ * Copyright © 2014, The OpenURP Software.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,41 +22,34 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.beangle.commons.collection.CollectUtils;
 import org.beangle.commons.dao.EntityDao;
 import org.beangle.commons.transfer.TransferResult;
 import org.beangle.commons.transfer.importer.listener.ItemImporterListener;
 import org.openurp.base.model.Department;
-import org.openurp.edu.base.code.model.CurrencyCategory;
-import org.openurp.edu.base.code.model.FeeMode;
 import org.openurp.edu.base.code.model.FeeType;
 import org.openurp.edu.base.model.Semester;
 import org.openurp.edu.base.model.Student;
+import org.openurp.edu.base.model.StudentState;
 import org.openurp.edu.base.service.SemesterService;
 import org.openurp.edu.fee.model.FeeDetail;
+import org.openurp.edu.fee.utils.StudentUtils;
 import org.openurp.edu.web.util.ImporterListenerUtils;
 
 /**
  * 一次性导入excel中的所有收费信息
  *
  * @author chaostone
- *
  */
 public class FeeDetailImportListener extends ItemImporterListener {
-
-  /** 发票号由数字组成 */
-  private final int NUMBERCHAIN = 1;
-
-  /** 发票号由字母和数字组成 */
-  private final int LETTERNUMBERCHAIN = 2;
-
-  /** 发票号由字母和数字组成，但号码的第一位必须为字母 */
-  private final int FIRSTLETTERCHAIN = 3;
 
   private EntityDao entityDao;
 
   private SemesterService semesterService;
+
+  private FeeDetailService feeDetailService;
 
   private List<FeeDetail> feeDetails;
 
@@ -68,9 +61,9 @@ public class FeeDetailImportListener extends ItemImporterListener {
 
   private Map<String, FeeType> feeTypeMap;
 
-  private Map<String, FeeMode> feeModeMap;
+  private Map<Student, StudentState> studentStateMap;
 
-  private Map<String, CurrencyCategory> currencyCategoryMap;
+  private Date nowAt;
 
   public FeeDetailImportListener() {
     super();
@@ -83,8 +76,8 @@ public class FeeDetailImportListener extends ItemImporterListener {
     studentMap = CollectUtils.newHashMap();
     departmentMap = CollectUtils.newHashMap();
     feeTypeMap = CollectUtils.newHashMap();
-    feeModeMap = CollectUtils.newHashMap();
-    currencyCategoryMap = CollectUtils.newHashMap();
+    studentStateMap = CollectUtils.newHashMap();
+    nowAt = new Date();
   }
 
   public void onStart(TransferResult tr) {
@@ -93,30 +86,13 @@ public class FeeDetailImportListener extends ItemImporterListener {
 
   // FIXME 暂时不做了 ---- 先别删除下面注释掉的语句
   public void onItemStart(TransferResult tr) {
-    // 检验缴费日期的合法性
-    ImporterListenerUtils.checkIsEmpty(tr, importer, Date.class, "createdAt", true, true, "yyyy-M-d", null);
-
     // 学生
     Student student = ImporterListenerUtils.checkAndConvertObject(entityDao, tr, importer, Student.class,
         "std.user.code", false, studentMap);
 
-    // 收费部门
+    // 收费部门（默认为学生所在院系，因此允许为空）
     ImporterListenerUtils.checkAndConvertObject(entityDao, tr, importer, Department.class, "depart.code",
-        false, departmentMap);
-
-    // 交费类型
-    ImporterListenerUtils.checkAndConvertObject(entityDao, tr, importer, FeeType.class, "type.code", false,
-        feeTypeMap);
-
-    // 交费方式
-    ImporterListenerUtils.checkAndConvertObject(entityDao, tr, importer, FeeMode.class, "mode.code", false,
-        feeModeMap);
-
-    // 应缴费用
-    ImporterListenerUtils.checkIsEmpty(tr, importer, Float.class, "shouldPay", true, true, "0.00", null);
-
-    // 实缴金额
-    ImporterListenerUtils.checkIsEmpty(tr, importer, Float.class, "payed", true, true, "0.00", null);
+        true, departmentMap);
 
     // 学年学期
     if (null != student) {
@@ -137,32 +113,42 @@ public class FeeDetailImportListener extends ItemImporterListener {
           importer.getCurData().put("semester", semester);
         }
       }
+      if (null != semester) {
+        StudentState studentState = studentStateMap.get(student);
+        if (null == studentState) {
+          List<StudentState> studentStates = StudentUtils.getStudentStates(student, semester);
+          if (CollectionUtils.isEmpty(studentStates) || studentStates.size() != 1) {
+            tr.addFailure("本学生在指定学年学期没有找到所在的学籍状态信息。", "<b>std.user.code</b>=" + student.getCode()
+                + "<b>semester.schoolYear</b>=" + StringUtils.defaultString(schoolYear)
+                + ", <b>semester.name</b>=" + StringUtils.defaultString(term));
+          } else {
+            FeeDetail feeDetail = feeDetailService.getFeeDetail(student, semester);
+            if (null != feeDetail) {
+              importer.getCurData().put("feeDetail", feeDetail);
+            }
+            studentStateMap.put(student, studentStates.get(0));
+          }
+        }
+      }
     }
 
-    // 货币类型
-    ImporterListenerUtils.checkAndConvertObject(entityDao, tr, importer, CurrencyCategory.class,
-        "currencyCategory.code", false, currencyCategoryMap);
+    // 应缴费用
+    ImporterListenerUtils.checkIsEmpty(tr, importer, Float.class, "shouldPay", true, true, "0.00", null);
 
-    // 折合人民币
-    ImporterListenerUtils.checkIsEmpty(tr, importer, Float.class, "toRMB", true, true, "0.00", null);
+    // 交费类型
+    ImporterListenerUtils.checkAndConvertObject(entityDao, tr, importer, FeeType.class, "type.code", false,
+        feeTypeMap);
 
-    // Object obj1 = map.get("invoiceCode");
-    // if (obj1 == null) {
-    // return;
-    // }
-    // String invoiceCode = obj1.toString();
-    // FIXME here 先别删除这些注释掉的语句
-    // if (isValidInvoiceCode(tr, invoiceCode, LETTERNUMBERCHAIN)) {
-    // Object obj2 = entityDao.loadByKey(FeeDetail.class, "invoiceCode",
-    // invoiceCode);
-    // if (obj2 == null) {
+    // 实缴金额
+    Float payed = ImporterListenerUtils.checkIsEmpty(tr, importer, Float.class, "payed", true, true, "0.00",
+        null);
+
+    // 终缴日期：如果实缴金额不为空，则本字段为必填，不然忽略
+    if (null != payed) {
+      ImporterListenerUtils.checkIsEmpty(tr, importer, Float.class, "payedAt", false, true, "0.00", null);
+    }
+
     super.onItemStart(tr);
-    // } else {
-    // this.importer.setCurrent(obj2);
-    // }
-    // } else {
-    // tr.addFailure("invoice code is invalid.", invoiceCode);
-    // }
   }
 
   public void onFinish(TransferResult tr) {
@@ -174,63 +160,22 @@ public class FeeDetailImportListener extends ItemImporterListener {
 
   public void onItemFinish(TransferResult tr) {
     if (!tr.hasErrors()) {
-      feeDetails.add((FeeDetail) importer.getCurrent());
-    }
-  }
-
-  /**
-   * 验证发票号的合法性
-   *
-   * @param tr
-   * @param invoiceCode
-   * @param flag
-   * @return
-   */
-  private boolean isValidInvoiceCode(TransferResult tr, String invoiceCode, int flag) {
-    // FIXME: 调用处是在上面FIXME处
-    if (null == ImporterListenerUtils.checkIsEmpty(tr, importer, Float.class, "invoiceCode", true, false,
-        null, null)) {
-      return false;
-    }
-    boolean isNumber = true;
-    boolean isLetter = true;
-    for (int i = 0; i < invoiceCode.length(); i++) {
-      switch (flag) {
-        case NUMBERCHAIN:
-          if (invoiceCode.charAt(i) >= '0' && invoiceCode.charAt(i) <= '9') {
-            isNumber = true;
-          } else {
-            isNumber = false;
-          }
-          if (isNumber == false) {
-            return false;
-          }
-          break;
-        case FIRSTLETTERCHAIN:
-          if (i == 0 && (invoiceCode.charAt(i) >= 'A' && invoiceCode.charAt(i) <= 'Z') == false) {
-            return false;
-          }
-        case LETTERNUMBERCHAIN:
-          if (invoiceCode.charAt(i) >= 'A' && invoiceCode.charAt(i) <= 'Z') {
-            isLetter = true;
-          } else {
-            isLetter = false;
-          }
-          if (invoiceCode.charAt(i) >= '0' && invoiceCode.charAt(i) <= '9') {
-            isNumber = true;
-          } else {
-            isNumber = false;
-          }
-          if (isLetter == false && isNumber == false) {
-            return false;
-          }
-          break;
-
-        default:
-          return false;
+      FeeDetail feeDetail = ImporterListenerUtils.getValue(importer, "feeDetail");
+      if (null == feeDetail) {
+        feeDetail = (FeeDetail) importer.getCurrent();
       }
+      if (null == feeDetail.getDepart()) {
+        feeDetail.setDepart(studentStateMap.get(feeDetail.getStd()).getDepartment());
+      }
+      feeDetail.setType(ImporterListenerUtils.getValue(importer, "type"));
+      // 如果实缴为空，则下面这些字段忽略
+      if (null == feeDetail.getPayed()) {
+        feeDetail.setPayedAt(null);
+        feeDetail.setWhoAdded(null);
+      }
+      feeDetail.setUpdatedAt(nowAt);
+      feeDetails.add(feeDetail);
     }
-    return true;
   }
 
   public void setEntityDao(EntityDao entityDao) {
@@ -239,5 +184,9 @@ public class FeeDetailImportListener extends ItemImporterListener {
 
   public void setSemesterService(SemesterService semesterService) {
     this.semesterService = semesterService;
+  }
+
+  public void setFeeDetailService(FeeDetailService feeDetailService) {
+    this.feeDetailService = feeDetailService;
   }
 }

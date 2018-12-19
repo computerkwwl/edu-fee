@@ -1,7 +1,7 @@
 /*
  * OpenURP, Agile University Resource Planning Solution.
  *
- * Copyright (c) 2005, The OpenURP Software.
+ * Copyright © 2014, The OpenURP Software.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,13 +40,22 @@ public class FeeDefault extends NumberIdObject<Integer> {
 
   private static final long serialVersionUID = -3198565526508585146L;
 
+  /** 起始年级 */
+  @NotNull
+  @Size(max = 50)
+  private String fromGrade;
+
+  /** 截止年级 */
+  @NotNull
+  @Size(max = 50)
+  private String toGrade;
+
   /** 学历层次（原：学生类别） */
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
   private EducationLevel level;
 
   /** 系 */
-  @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
   private Department department;
 
@@ -66,6 +75,22 @@ public class FeeDefault extends NumberIdObject<Integer> {
   /** remark */
   @Size(max = 500)
   private String remark;
+
+  public String getFromGrade() {
+    return fromGrade;
+  }
+
+  public void setFromGrade(String fromGrade) {
+    this.fromGrade = fromGrade;
+  }
+
+  public String getToGrade() {
+    return toGrade;
+  }
+
+  public void setToGrade(String toGrade) {
+    this.toGrade = toGrade;
+  }
 
   /**
    * @return Returns the value.
