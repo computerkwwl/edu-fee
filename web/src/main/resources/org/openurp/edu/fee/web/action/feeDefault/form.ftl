@@ -10,7 +10,7 @@
     [@b.textfield label="截止年级" name="feeDefault.toGrade" value=(feeDefault.toGrade)! required="true" check="match('yearMonth')" maxlength="6" style=elementSTYLE comment="格式同上"/]
     [@b.select id=s + "span" label="学历层次" name="feeDefault.level.id" items=levels?sort_by(["name"]) empty="..." value=(feeDefault.level.id)! required="true" style=elementSTYLE/]
     [@b.select id=s + "department" label="院系所" name="feeDefault.department.id" items=departments?sort_by(["name"]) empty="..." value=(feeDefault.department.id)! style=elementSTYLE/]
-    [@b.select id=s + "major" label="专业" name="feeDefault.major.id" items=majors?sort_by(["name"]) empty="..." value=(feeDefault.major.id)! style=elementSTYLE/]
+    [@b.select id=s + "major" label="专业" name="feeDefault.major.id" items=majors?sort_by(["name"]) empty="..." value=(feeDefault.major.id)! required="true" style=elementSTYLE/]
     [@b.select label="交费类型" name="feeDefault.type.id" items=feeTypes?sort_by(["name"]) value=(feeDefault.type.id)! empty="..." required="true" style=elementSTYLE/]
     [@b.textfield label="总额" name="feeDefault.value" value=(feeDefault.value)!0 required="true" maxlength="64" check="match('number')" style=elementSTYLE/]
     [@b.textarea label="备注" name="feeDefault.remark" value=(feeDefault.remark?html)! maxlength="200" rows="3" style=elementSTYLE/]

@@ -249,7 +249,7 @@ public class FeeDetailAction extends FeeSearchAction {
       feeDetail.setType(feeDefault.getType());
       // 总额／学制
       feeDetail
-          .setShouldPay(BigDecimalUtils.divide(feeDefault.getValue(), student.getDuration(), Float.class));
+          .setShouldPay(BigDecimalUtils.divide(feeDefault.getValue(), Math.ceil(student.getDuration()), Float.class));
       feeDetail.setWhoAdded(getUsername() + "(初始化)");
       feeDetail.setUpdatedAt(nowAt);
       toSaveFeeDetails.add(feeDetail);
