@@ -46,6 +46,7 @@ import org.openurp.edu.fee.model.FeeDefault;
 import org.openurp.edu.fee.model.FeeDetail;
 import org.openurp.edu.fee.utils.BigDecimalUtils;
 import org.openurp.edu.fee.utils.ConditionUtils;
+import org.openurp.edu.fee.utils.StudentUtils;
 
 public class FeeDetailAction extends FeeSearchAction {
 
@@ -69,7 +70,7 @@ public class FeeDetailAction extends FeeSearchAction {
     String sessionId = getRequest().getSession().getId();
     sessionInitStudentMap.remove(sessionId);
 
-    Semester semester = entityDao.get(Semester.class, getIntId("feeDetail.semester"));
+    Semester semester = getFirstSemesterInCurrentYear(getIntId("feeDetail.semester"));
 
     // 获取在指定学年学期期间在校的学生
     OqlBuilder<Student> builder1 = OqlBuilder.from(Student.class, "student");
@@ -148,6 +149,7 @@ public class FeeDetailAction extends FeeSearchAction {
       for (StudentState state : student.getStates()) {
         if (state.getBeginOn().before(semester.getEndOn()) && state.getEndOn().after(semester.getBeginOn())) {
           currentState = state;
+          currentStateMap.put(student, currentState);
           break;
         }
       }
@@ -175,27 +177,26 @@ public class FeeDetailAction extends FeeSearchAction {
       Float sum = new Float(sumFeeMap.containsKey(student.getId()) ? (Double) sumFeeMap.get(student.getId())
           : 0);
       if (sum.compareTo(defaultValue) >= 0) {
+        currentStateMap.remove(student); // 去除已缴足的学生
         continue;
       }
-      currentStateMap.put(student, currentState);
       stateFeeDefaultMap.put(currentState, feeDefault);
     }
 
-    if (CollectionUtils.isNotEmpty(students)) {
+    students = CollectUtils.newArrayList(currentStateMap.keySet());
+    if (MapUtils.isEmpty(stateFeeDefaultMap)) {
+      builder1.where("student is null");
+    } else {
       Boolean hasFeeDefault = getBoolean("hasFeeDefault");
       if (null == hasFeeDefault) {
         builder1.where(ConditionUtils.splitCollection("student", "students", 900, students));
       } else {
-        if (hasFeeDefault) {
-          if (currentStateMap.isEmpty()) {
-            builder1.where("student is null");
-          } else {
-            builder1.where(ConditionUtils.splitCollection("student", "students", 900,
-                CollectUtils.newArrayList(currentStateMap.keySet())));
-          }
+        List<Student> beenFDStudents = StudentUtils.getStudents(stateFeeDefaultMap.keySet());
+        if (hasFeeDefault.booleanValue()) {
+          builder1.where(ConditionUtils.splitCollection("student", "students", 900, beenFDStudents));
         } else {
           builder1.where(ConditionUtils.splitCollection("student", "students", 900,
-              CollectUtils.newArrayList(CollectionUtils.subtract(students, currentStateMap.keySet()))));
+              CollectionUtils.subtract(students, beenFDStudents)));
         }
       }
       builder1.limit(getPageLimit());
@@ -215,6 +216,20 @@ public class FeeDetailAction extends FeeSearchAction {
     put("currentStateMap", currentStateMap);
     put("stateFeeDefaultMap", stateFeeDefaultMap);
     return forward();
+  }
+
+  protected Semester getFirstSemesterInCurrentYear(Integer semesterId) {
+    OqlBuilder<Semester> builder = OqlBuilder.from(Semester.class, "semester");
+    StringBuilder hql = new StringBuilder();
+    hql.append("exists (");
+    hql.append("  from ").append(Semester.class.getName()).append(" semester1");
+    hql.append(" where to_char(semester1.beginOn, 'yyyy') = to_char(semester.beginOn, 'yyyy')");
+    hql.append("   and semester1.id = :semesterId");
+    hql.append(")");
+    builder.where(hql.toString(), semesterId);
+    builder.orderBy(Order.parse("semester.beginOn"));
+    List<Semester> semesters = entityDao.search(builder);
+    return CollectUtils.isEmpty(semesters) ? null : semesters.get(0);
   }
 
   public String beforeInitCheckAjax() {
@@ -248,8 +263,8 @@ public class FeeDetailAction extends FeeSearchAction {
       feeDetail.setDepart(currentState.getDepartment());
       feeDetail.setType(feeDefault.getType());
       // 总额／学制
-      feeDetail
-          .setShouldPay(BigDecimalUtils.divide(feeDefault.getValue(), Math.ceil(student.getDuration()), Float.class));
+      feeDetail.setShouldPay(BigDecimalUtils.divide(feeDefault.getValue(), Math.ceil(student.getDuration()),
+          Float.class));
       feeDetail.setWhoAdded(getUsername() + "(初始化)");
       feeDetail.setUpdatedAt(nowAt);
       toSaveFeeDetails.add(feeDetail);

@@ -18,8 +18,10 @@
  */
 package org.openurp.edu.fee.utils;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.beangle.commons.collection.CollectUtils;
@@ -63,5 +65,13 @@ public class StudentUtils {
       }
     }
     return studentStates;
+  }
+
+  public static List<Student> getStudents(Collection<StudentState> states) {
+    Set<Student> students = CollectUtils.newHashSet();
+    for (StudentState studentState : states) {
+      students.add(studentState.getStd());
+    }
+    return CollectUtils.newArrayList(students);
   }
 }

@@ -92,62 +92,34 @@ public class FeeDefault extends NumberIdObject<Integer> {
     this.toGrade = toGrade;
   }
 
-  /**
-   * @return Returns the value.
-   */
   public Integer getValue() {
     return value;
   }
 
-  /**
-   * @param value
-   *          The value to set.
-   */
   public void setValue(Integer defaultValue) {
     this.value = defaultValue;
   }
 
-  /**
-   * @return Returns the type.
-   */
   public FeeType getType() {
     return type;
   }
 
-  /**
-   * @param type
-   *          The type to set.
-   */
   public void setType(FeeType feeType) {
     this.type = feeType;
   }
 
-  /**
-   * @return Returns the remark.
-   */
   public String getRemark() {
     return remark;
   }
 
-  /**
-   * @param remark
-   *          The remark to set.
-   */
   public void setRemark(String remark) {
     this.remark = remark;
   }
 
-  /**
-   * @return Returns the level.
-   */
   public EducationLevel getLevel() {
     return level;
   }
 
-  /**
-   * @param stdType
-   *          The level to set.
-   */
   public void setLevel(EducationLevel level) {
     this.level = level;
   }

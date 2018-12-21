@@ -19,6 +19,7 @@
 package org.openurp.edu.fee.utils;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +45,20 @@ public class ConditionUtils {
    * @return
    */
   public static <ID extends Serializable, T extends Entity<ID>> Condition splitCollection(
-      String fieldStr, String inStr, int perLen, List<T> data) {
+      String fieldStr, String inStr, int perLen, Collection<T> data) {
+    return splitCollection(fieldStr, inStr, perLen, CollectUtils.newArrayList(data));
+  }
+    /**
+     * 将按指定的字段、参加名称、对应的数据和指定的长度（默认为1000）拆分成多个查询条件
+     *
+     * @param fieldStr
+     * @param inStr
+     * @param perLen 默认为 1000
+     * @param data
+     * @return
+     */
+    public static <ID extends Serializable, T extends Entity<ID>> Condition splitCollection(
+        String fieldStr, String inStr, int perLen, List<T> data) {
     int splitLen = 0 == perLen ? DEFAULT_PER_LEN : perLen;
     int n = data.size() / splitLen + (data.size() % splitLen == 0 ? 0 : 1);
 
