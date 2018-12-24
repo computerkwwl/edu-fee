@@ -28,7 +28,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.beangle.commons.collection.CollectUtils;
 import org.beangle.commons.collection.Order;
-import org.beangle.commons.dao.query.builder.Condition;
 import org.beangle.commons.dao.query.builder.OqlBuilder;
 import org.beangle.commons.transfer.TransferListener;
 import org.beangle.commons.transfer.importer.EntityImporter;
@@ -86,12 +85,19 @@ public class FeeDetailAction extends FeeSearchAction {
     builder1.where(hql.toString(), semester.getEndOn(), semester.getBeginOn());
     List<Student> students = entityDao.search(builder1);
 
-    // 获得上面所获学生所有历史缴费记录
+    // 获得上面所获学生所有历史应缴记录
     OqlBuilder<?> builder2 = OqlBuilder.from(FeeDetail.class.getName() + " feeDetail");
-    Condition studentCondition = ConditionUtils.splitCollection("feeDetail.std", "stds", 900, students);
-    builder2.where(studentCondition);
+    hql = new StringBuilder();
+    hql.append("exists (");
+    hql.append("  from ").append(StudentState.class.getName()).append(" studentState");
+    hql.append(" where studentState.std = feeDetail.std");
+    hql.append("   and studentState.inschool = true");
+    hql.append("   and studentState.beginOn <= :endOn");
+    hql.append("   and studentState.endOn >= :beginOn");
+    hql.append(")");
+    builder2.where(hql.toString(), semester.getEndOn(), semester.getBeginOn());
     builder2.groupBy("feeDetail.std.id");
-    builder2.select("feeDetail.std.id, sum(feeDetail.payed)");
+    builder2.select("feeDetail.std.id, sum(feeDetail.shouldPay)");
     List<Object[]> stats = (List<Object[]>) entityDao.search(builder2);
     Map<Long, Number> sumFeeMap = CollectUtils.newHashMap();
     for (Object[] data : stats) {
@@ -99,7 +105,7 @@ public class FeeDetailAction extends FeeSearchAction {
     }
 
     OqlBuilder<FeeDetail> builder3 = OqlBuilder.from(FeeDetail.class, "feeDetail");
-    builder3.where(studentCondition);
+    builder3.where(hql.toString(), semester.getEndOn(), semester.getBeginOn());
     builder3.where("feeDetail.semester = :semester", semester);
     List<FeeDetail> feesBySemester = entityDao.search(builder3);
     Map<Student, FeeDetail> feeBySemesterMap = CollectUtils.newHashMap();
@@ -358,10 +364,5 @@ public class FeeDetailAction extends FeeSearchAction {
 
   public void setImporterListeners(List<TransferListener> importerListeners) {
     this.importerListeners = importerListeners;
-  }
-
-  @Override
-  protected String getEntityName() {
-    return FeeDetail.class.getName();
   }
 }

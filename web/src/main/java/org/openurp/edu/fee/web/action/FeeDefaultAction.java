@@ -110,10 +110,11 @@ public class FeeDefaultAction extends SemesterSupportAction {
         builder.where(hql.toString(), template.getToGrade(), template.getFromGrade(), template.getLevel(),
             template.getDepartment());
         builder.where("major.project = :project", getProject());
+        builder.where("exists (from major.journals journal where journal.level = :level)");
         builder.where("major.beginOn <= :nowAt", new Date());
         builder.where("major.endOn is null or major.endOn >= :nowAt");
-        List<Major> majors = entityDao.search(builder);
-        for (Major major : majors) {
+        // List<Major> majors = entityDao.search(builder);
+        for (Major major : entityDao.search(builder)) {
           FeeDefault feeDefault = populateEntity(FeeDefault.class, "feeDefault");
           feeDefault.setMajor(major);
           feeDefaults.add(feeDefault);
