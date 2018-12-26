@@ -48,7 +48,7 @@
       [@b.col title="培养层次" property="level.name"/]
       [@b.col title="common.college" sortable="false"][#assign currentStudentState = currentStateMap.get(student)/]${(currentStudentState.department.name)}[/@]
       [@b.col title="专业" sortable="false"]${currentStudentState.major.name}[/@]
-      [@b.col title="应缴" sortable="false"]${(stateFeeDefaultMap.get(currentStudentState).value / student.duration)!"<span style=\"color: red\">收费标准未找到</span>"}[/@]
+      [@b.col title="应缴" sortable="false"]${(stateFeeDefaultMap.get(currentStudentState).value / student.duration?ceiling)!"<span style=\"color: red\">收费标准未找到</span>"}[/@]
     [/@]
   [/@]
 [@b.foot/]
