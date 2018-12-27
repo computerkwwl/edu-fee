@@ -29,7 +29,7 @@
     </div>
   [/@]
   [@b.form name="downloadForm" action="!downloadTemplate"]
-    <input type="hidden" name="file" value="template/excel/feeDetail.xls"/>
+    <input type="hidden" name="file" value="/template/excel/feeDetail.xls"/>
     <input type="hidden" name="display" value="收费信息导入模板"/>
   [/@]
 [@b.foot/]
