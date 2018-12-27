@@ -84,7 +84,6 @@ public class FeeDetailImportListener extends ItemImporterListener {
     init();
   }
 
-  // FIXME 暂时不做了 ---- 先别删除下面注释掉的语句
   public void onItemStart(TransferResult tr) {
     // 学生
     Student student = ImporterListenerUtils.checkAndConvertObject(entityDao, tr, importer, Student.class,

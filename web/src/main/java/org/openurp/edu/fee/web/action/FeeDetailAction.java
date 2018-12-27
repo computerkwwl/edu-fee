@@ -59,6 +59,11 @@ public class FeeDetailAction extends FeeSearchAction {
     sessionInitStudentMap = CollectUtils.newHashMap();
   }
 
+  protected String getEntityName() {
+    // 在导入中需要使用
+    return FeeDetail.class.getName();
+  }
+
   public String initIndex() {
     put("semester", entityDao.get(Semester.class, getIntId("feeDetail.semester")));
     put("departments", getDeparts());
